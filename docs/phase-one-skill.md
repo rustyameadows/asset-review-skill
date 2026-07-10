@@ -147,7 +147,6 @@ Navigation must work without JavaScript.
 
 The bundled enhancement script may:
 
-- filter already-rendered cards by text
 - switch inspection backgrounds
 - add keyboard conveniences
 - improve nonessential focus or display behavior
@@ -290,7 +289,6 @@ Exit criterion: every asset and comparison has a stable URL and semantic figure.
 
 ### Milestone 4: Optional UI niceties
 
-- add text filtering over existing cards
 - add inspection background switching
 - verify no-JavaScript fallback
 

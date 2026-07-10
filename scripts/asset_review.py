@@ -553,29 +553,12 @@ def _review_header(manifest: dict[str, Any], active_view: str) -> str:
   <div class="eyebrow"><span>Asset Review</span><span>Round {_escape(review.get('round', 1))}</span></div>
   <h1>{_escape(review.get('title'))}</h1>
   <p class="objective">{_escape(review.get('objective'))}</p>
-  <p class="instructions">{_escape(review.get('instructions'))}</p>
   <nav class="review-nav" aria-label="Review navigation">
     <a href="index.html"{grid_current}>Grid</a>
     <a href="list.html"{list_current}>List</a>
     {group_links}
   </nav>
-  <div class="asset-tools">
-    <label for="asset-filter">Filter assets</label>
-    <input id="asset-filter" type="search" placeholder="Search names, filenames, or metadata" autocomplete="off">
-    <span id="filter-status" aria-live="polite"></span>
-  </div>
 </header>"""
-
-
-def _comparison_links(manifest: dict[str, Any]) -> str:
-    comparisons = manifest.get("comparisons", [])
-    if not comparisons:
-        return ""
-    links = "".join(
-        f'<li><a href="comparison/{_escape(item["id"])}.html">{_escape(item.get("label") or item.get("purpose") or item["id"])}</a></li>'
-        for item in comparisons
-    )
-    return f'<aside class="comparison-index" aria-labelledby="comparison-title"><h2 id="comparison-title">Prepared comparisons</h2><ul>{links}</ul></aside>'
 
 
 def _focus_page(asset: dict[str, Any], manifest: dict[str, Any]) -> str:
@@ -639,8 +622,8 @@ def _comparison_page(comparison: dict[str, Any], assets_by_id: dict[str, dict[st
 
 
 def render_static_site(manifest: dict[str, Any], output_dir: Path) -> None:
-    index_body = '<main class="review-page">' + _review_header(manifest, "grid") + _comparison_links(manifest) + _group_sections(manifest, "grid") + "</main>"
-    list_body = '<main class="review-page">' + _review_header(manifest, "list") + _comparison_links(manifest) + _group_sections(manifest, "list") + "</main>"
+    index_body = '<main class="review-page">' + _review_header(manifest, "grid") + _group_sections(manifest, "grid") + "</main>"
+    list_body = '<main class="review-page">' + _review_header(manifest, "list") + _group_sections(manifest, "list") + "</main>"
     (output_dir / "index.html").write_text(_document(manifest["review"]["title"], index_body), encoding="utf-8")
     (output_dir / "list.html").write_text(_document(manifest["review"]["title"], list_body), encoding="utf-8")
 

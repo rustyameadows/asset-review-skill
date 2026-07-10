@@ -76,6 +76,9 @@ class AssetReviewTests(unittest.TestCase):
             self.assertIn("<figcaption>", index)
             self.assertNotIn("Submit review", index)
             self.assertNotIn("asset_status", index)
+            self.assertNotIn('class="instructions"', index)
+            self.assertNotIn('class="asset-tools"', index)
+            self.assertNotIn('class="comparison-index"', index)
 
     def test_static_comparison_page(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

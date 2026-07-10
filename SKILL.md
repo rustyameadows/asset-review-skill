@@ -72,7 +72,7 @@ The generator writes all asset content into the initial HTML response. Preserve 
 - Never react to annotation mode or attempt to store annotations.
 - Ensure the complete review remains usable when JavaScript is disabled.
 
-The bundled `assets/review-app/enhancements.js` may filter already-rendered cards or change inspection backgrounds. It must not fetch review data, generate content, or own durable state.
+The bundled `assets/review-app/enhancements.js` only changes inspection backgrounds on focus and comparison pages. It must not fetch review data, generate content, or own durable state.
 
 ## Refresh after edits
 
