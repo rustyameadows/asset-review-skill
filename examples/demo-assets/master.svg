@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f8c6d8"/><stop offset="1" stop-color="#f6ef98"/></linearGradient>
+    <linearGradient id="orb" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff5e62"/><stop offset="1" stop-color="#7c3aed"/></linearGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg)"/>
+  <circle cx="1230" cy="500" r="350" fill="url(#orb)"/>
+  <circle cx="1230" cy="500" r="250" fill="#ffe98a" opacity=".86"/>
+  <rect x="1010" y="270" width="440" height="500" rx="210" fill="#fff" opacity=".26" transform="rotate(-14 1230 520)"/>
+  <text x="110" y="150" fill="#1c1438" font-family="Arial, sans-serif" font-size="30" font-weight="700" letter-spacing="8">SOLAR CLUB</text>
+  <text x="105" y="400" fill="#1c1438" font-family="Arial, sans-serif" font-size="118" font-weight="800">MAKE SPACE</text>
+  <text x="105" y="520" fill="#1c1438" font-family="Arial, sans-serif" font-size="118" font-weight="800">FOR BRIGHT.</text>
+  <text x="110" y="620" fill="#1c1438" font-family="Arial, sans-serif" font-size="34">A colorful system for brighter launches.</text>
+  <rect x="110" y="710" width="260" height="74" rx="37" fill="#1c1438"/>
+  <text x="240" y="758" text-anchor="middle" fill="#fff" font-family="Arial, sans-serif" font-size="25" font-weight="700">EXPLORE NOW</text>
+  <text x="110" y="920" fill="#1c1438" font-family="Arial, sans-serif" font-size="23">APPROVED CAMPAIGN MASTER · 16:10</text>
+</svg>

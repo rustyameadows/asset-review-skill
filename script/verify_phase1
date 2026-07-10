@@ -1,0 +1,16 @@
+#!/bin/sh
+set -eu
+
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+PYTHON=${PYTHON:-python3}
+
+cd "$ROOT"
+"$PYTHON" -m unittest discover -s tests -v
+
+if command -v node >/dev/null 2>&1; then
+  node --check assets/review-app/enhancements.js
+fi
+
+"$PYTHON" scripts/build_demo.py
+"$PYTHON" scripts/validate_review.py .codex/reviews/solar-club-round-01 --project-root "$ROOT"
+echo "Phase one verification passed."

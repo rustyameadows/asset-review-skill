@@ -4,7 +4,7 @@
 
 Describe the destination native Asset Review surface inside Codex/ChatGPT and show how it can replace the phase-one browser renderer without replacing the review workflow or data model.
 
-This is a future product plan, not a commitment to begin by modifying the Codex application. Native work should follow evidence from the skill prototype.
+This is a future product plan, not a commitment to begin by modifying the Codex application. Native work should follow evidence from the skill prototype. The phase-one skill remains a static, stateless HTML presentation and delegates all annotation behavior to Codex/ChatGPT.
 
 ## Native product definition
 
@@ -397,7 +397,7 @@ The skill should transition in stages:
 1. Detect whether the native Asset Review tool is available.
 2. Build the same logical review contract regardless of renderer.
 3. Invoke the native surface when available.
-4. Fall back to the generated browser application when unavailable or when a format requires it.
+4. Fall back to the generated static HTML view when unavailable or when a format requires it.
 5. Normalize browser and native results into one feedback taxonomy.
 6. Eventually reduce the skill to coordination guidance and compatibility helpers.
 

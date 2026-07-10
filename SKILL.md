@@ -1,80 +1,100 @@
 ---
 name: asset-review
-description: Create and coordinate browser-based visual review sessions for project assets. Use when Codex needs to present folders or selected images, documents, generated media, campaign variants, creative directions, or delivery exports for browsing, comparison, annotation, approval, rejection, or revision before continuing production work.
+description: Create static visual review pages for project assets. Use when Codex needs to deliberately present selected images, documents, generated media, creative directions, campaign variants, or delivery exports in an annotation-friendly grid, focused view, or comparison view inside the in-app browser.
 ---
 
 # Asset Review
 
-Create a project-local review session that connects asset production to structured user feedback. Treat the review surface as a working checkpoint in the agent loop, not as a standalone gallery.
+Create a plain static HTML/CSS presentation for assets the agent has deliberately selected. Treat the page as a visual surface for Codex/ChatGPT's existing browser annotation system.
 
-## Coordinate the review
+Do not implement feedback, comments, approval state, annotation handling, persistence, or submission inside the generated site. The site must remain unaware of annotation mode.
 
-1. Infer the review objective from the request and current project context.
-2. Inspect the proposed source folders and select only assets relevant to that objective.
-3. Identify useful groups, version relationships, comparisons, and decisions.
-4. Preserve source files. Write generated review artifacts only beneath `.codex/reviews/` unless the user requests another location.
-5. Create a stable manifest before rendering the interface.
-6. Open the review in the in-app browser and state the decisions needed from the user.
-7. Map returned annotations and decisions to stable asset IDs.
-8. Summarize the interpreted actions before modifying source work.
-9. Preserve approved assets unless the user explicitly includes them in a later change.
-10. Create a new round for revised work and retain prior review history.
+## Prepare the review
 
-## Model the session
+1. Infer the review objective from the current task.
+2. Select only assets relevant to that objective; do not automatically dump an entire project into the view.
+3. Identify useful groups, labels, context, and comparisons.
+4. Preserve source files.
+5. Generate a static site beneath `.codex/reviews/<review-id>/`.
+6. Open the generated `index.html` directly when supported; otherwise start the bundled read-only static file server and open its loopback URL.
+7. Tell the user what to inspect or compare.
+8. Receive feedback only through Codex/ChatGPT's browser annotation flow.
+9. Edit the source work, regenerate the static site, and refresh the browser page.
 
-Create one directory per review round:
+## Generate the static site
 
-```text
-.codex/reviews/<review-id>/
-  review.json
-  state.json
-  index.html
-  assets/
-  thumbnails/
+Resolve this skill's directory as `SKILL_DIR`. For a straightforward selected set, run:
+
+```bash
+python3 "$SKILL_DIR/scripts/build_review.py" \
+  --project-root "$PROJECT_ROOT" \
+  --paths exports/master.png exports/social exports/email \
+  --output "$PROJECT_ROOT/.codex/reviews/campaign-round-01" \
+  --title "Campaign review" \
+  --objective "Compare the adaptations with the approved master"
 ```
 
-Use `review.json` for the immutable presentation contract: identity, objective, instructions, source assets, groups, relationships, comparisons, metadata, review questions, and requested decisions.
+Use `--manifest draft-review.json` when the agent needs explicit labels, groups, context, or prepared comparisons. Read [references/review-contract.md](references/review-contract.md) before authoring a manifest.
 
-Use `state.json` for mutable review results: status changes, selections, comments, annotations, review summary, timestamps, and links to prior or subsequent rounds.
+Validate the generated folder:
 
-Assign every asset, group, comparison, and prompt a stable ID. Keep source paths explicit and distinguish original files from copied or rendered review derivatives.
+```bash
+python3 "$SKILL_DIR/scripts/validate_review.py" \
+  "$PROJECT_ROOT/.codex/reviews/campaign-round-01" \
+  --project-root "$PROJECT_ROOT"
+```
 
-## Build the surface
+Open the generated file directly when the browser permits local files:
 
-Provide these modes when relevant:
+```text
+file://<absolute-project-path>/.codex/reviews/campaign-round-01/index.html
+```
 
-- Grid view for scanning and selecting a collection.
-- List view for filenames, dimensions, formats, and status.
-- Focus view for zoom, pan, metadata, context, and review questions.
-- Comparison view for previous/current, master/adaptation, or direction A/B.
+When the agent cannot navigate to `file://`, serve the folder with the bundled transport helper:
 
-Make asset identity visible near every reviewable region so browser annotations can be mapped back reliably. Prefer a small number of clear controls over an asset-management dashboard.
+```bash
+python3 "$SKILL_DIR/scripts/serve_review.py" \
+  "$PROJECT_ROOT/.codex/reviews/campaign-round-01"
+```
 
-Support PNG, JPEG, WebP, SVG, GIF, and rendered PDF pages first. Represent unsupported files with useful metadata and a source path instead of silently omitting them.
+Open the printed loopback URL. This helper only serves static files with no-cache headers. It has no application endpoints, accepts no writes, and owns no review or annotation state. Stop it when the review task ends.
 
-## Interpret feedback
+## Keep the HTML annotation-friendly
 
-Classify each returned note as one of:
+The generator writes all asset content into the initial HTML response. Preserve these rules when customizing the template:
 
-- approval
-- rejection
-- asset-specific revision
-- global revision
-- comparison preference
-- question
-- project instruction
+- Render every overview item as a visible, labeled `<figure>`.
+- Use ordinary `<img>`, `<video>`, `<figcaption>`, heading, link, list, and definition-list elements.
+- Give each asset figure a unique `id`, accessible label, and stable asset ID.
+- Keep focused assets and comparison sides as distinct semantic figures.
+- Never create the asset collection through JavaScript.
+- Never place a canvas, opaque interaction layer, or annotation shim over an asset.
+- Never react to annotation mode or attempt to store annotations.
+- Ensure the complete review remains usable when JavaScript is disabled.
 
-Resolve each note to one or more stable asset IDs. If a mapping is ambiguous and would change production work materially, ask the user before editing. Otherwise update state, summarize the action list, perform or delegate the requested work, and generate the next review round.
+The bundled `assets/review-app/enhancements.js` may filter already-rendered cards or change inspection backgrounds. It must not fetch review data, generate content, or own durable state.
+
+## Refresh after edits
+
+After changing source assets, rerun the same build command against the same output directory and refresh the open file in the in-app browser. A new review round is optional and should be created only when the agent or user needs a preserved historical presentation.
+
+Use `scripts/create_round.py` to create a separate linked round from a prior manifest. It does not interpret feedback or choose affected assets; pass `--include` when the agent wants a subset.
 
 ## Guardrails
 
-- Never overwrite or transform source assets merely to make them previewable.
-- Never treat a visual annotation as approval unless its meaning is clear.
-- Never silently replace a prior round.
-- Avoid copying sensitive or unrelated files into the review directory.
-- Keep the review runnable locally; do not publish or upload it without explicit authorization.
-- Call out missing, unrenderable, duplicated, or stale assets before requesting a decision.
+- Keep the source selection deliberate and explain exclusions when relevant.
+- Never overwrite source assets to make them previewable.
+- Never publish or upload the static review without explicit authorization.
+- Do not copy sensitive or unrelated files into the review folder.
+- Call out missing, unrenderable, duplicated, or stale assets.
+- Let Codex/ChatGPT own the entire annotation and feedback lifecycle.
 
-## Development status
+## Bundled resources
 
-This repository currently defines the interaction contract and implementation plan. Consult the documents in `docs/` when implementing or evaluating the phase-one renderer and the future native surface.
+- Use `scripts/inspect_assets.py` for inventory-only work.
+- Use `scripts/build_review.py` to generate the static site.
+- Use `scripts/validate_review.py` to verify the manifest and file references.
+- Use `scripts/serve_review.py` only as a read-only transport when the in-app browser cannot open `file://`.
+- Use `scripts/create_round.py` only when a separate historical round is useful.
+- Use `assets/review-app/styles.css` and `enhancements.js` as the static template resources.
+- Read [references/feedback-mapping.md](references/feedback-mapping.md) only when the agent needs help interpreting annotations returned by Codex; the generated page never reads it.

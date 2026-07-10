@@ -1,4 +1,4 @@
 interface:
   display_name: "Asset Review"
-  short_description: "Build interactive creative asset review sessions"
+  short_description: "Generate static creative asset review pages"
   default_prompt: "Use $asset-review to prepare the latest project assets for visual review."

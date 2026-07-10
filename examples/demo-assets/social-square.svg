@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffd3e2"/><stop offset="1" stop-color="#fff49c"/></linearGradient><linearGradient id="orb"><stop stop-color="#ff5e62"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs>
+  <rect width="1080" height="1080" fill="url(#bg)"/>
+  <circle cx="790" cy="350" r="250" fill="url(#orb)"/><circle cx="790" cy="350" r="165" fill="#ffe98a" opacity=".9"/>
+  <text x="70" y="100" fill="#1c1438" font-family="Arial, sans-serif" font-size="24" font-weight="700" letter-spacing="6">SOLAR CLUB</text>
+  <text x="66" y="680" fill="#1c1438" font-family="Arial, sans-serif" font-size="92" font-weight="800">MAKE SPACE</text>
+  <text x="66" y="775" fill="#1c1438" font-family="Arial, sans-serif" font-size="92" font-weight="800">FOR BRIGHT.</text>
+  <text x="70" y="855" fill="#1c1438" font-family="Arial, sans-serif" font-size="28">A colorful system for brighter launches.</text>
+  <rect x="70" y="915" width="230" height="68" rx="34" fill="#1c1438"/><text x="185" y="959" text-anchor="middle" fill="#fff" font-family="Arial, sans-serif" font-size="22" font-weight="700">EXPLORE NOW</text>
+</svg>

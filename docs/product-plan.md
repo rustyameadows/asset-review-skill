@@ -12,7 +12,11 @@ Asset Review is an agent-initiated surface for reviewing collections of creative
 
 The agent can create or gather work using image generation, computer use, project scripts, or other tools; organize the resulting files into a meaningful review session; and open that session for the user inside Codex. The user can scan the collection, inspect individual files, compare related versions, provide spatial feedback, and record decisions. Codex receives the review result as actionable project context, updates the work, and creates another review round.
 
-The initial product is a distributable skill that generates a local browser application. The long-term product is a native Codex surface built around the same manifest and result contract.
+The initial product is a distributable skill that generates a completely static HTML/CSS view. It contains no review state or annotation behavior; Codex/ChatGPT's existing browser annotation system owns feedback. The long-term product may introduce a native Codex surface around a richer structured contract.
+
+### Phase-one boundary
+
+Phase one is presentation only. The agent deliberately selects assets and generates semantic static HTML. The user annotates that HTML through Codex. The agent edits the work, regenerates the files, and refreshes the page. There is no application backend, API, submission flow, approval control, comment system, or mutable state. A tiny read-only loopback server may serve the static folder when the browser cannot open local files directly.
 
 ## Product thesis
 
@@ -68,14 +72,14 @@ When assets are believed to be final, help the user verify content, dimensions, 
 
 ## Interaction model
 
-Asset Review is a stateful loop, not a one-time preview:
+The overall agent workflow is iterative, while the phase-one page itself remains stateless:
 
 ```text
 User intent
   -> agent production or discovery
   -> review assembly
   -> review session
-  -> structured decisions and annotations
+  -> Codex browser annotations
   -> agent action summary
   -> revision or delivery
   -> next review round or completion
@@ -106,10 +110,9 @@ The user can:
 - zoom, pan, fit, and change the inspection background
 - compare related assets
 - annotate regions or cards
-- add asset-level or general comments
-- select preferred versions
-- approve, reject, or request changes
-- submit the review round
+- annotate assets, captions, or comparison sides through Codex
+- express preferences, approvals, rejections, and requested changes in those annotations
+- tell the agent when the annotation pass is complete
 
 ### Agent responsibilities after review
 
@@ -120,8 +123,8 @@ The agent must:
 - separate decisions from exploratory comments or questions
 - summarize the interpreted action list
 - request clarification only for consequential ambiguity
-- update persistent review state
-- preserve approvals unless explicitly superseded
+- keep interpretation and action context in the Codex task, not in the page
+- preserve previously accepted work unless explicitly superseded
 - perform or delegate revisions
 - create a new round rather than replacing the old one
 - narrow subsequent reviews to changed or affected work when useful
@@ -130,11 +133,11 @@ The agent must:
 
 ### Collection view
 
-A contact sheet optimized for visual scanning. It should support grouping, sorting, filtering, selection, visible status, and readable identity. The earlier prototype demonstrates the value of a dense grid with consistent cells, background switching, family filters, and multi-select comparison.
+A contact sheet optimized for visual scanning and annotation. Phase one uses direct semantic figure cards, grouping, static navigation, lightweight filtering, and readable identity. The earlier prototype demonstrates the value of a dense grid and clear visual families, but phase one must not introduce review-state controls.
 
 ### List view
 
-A compact production view emphasizing filename, dimensions, format, file size, version, group, and status. This is especially useful for export and delivery review.
+A compact production view emphasizing filename, dimensions, format, file size, version, and group. This is especially useful for export and delivery review.
 
 ### Focus view
 
@@ -214,7 +217,9 @@ The product contract must remain independent of any particular renderer.
 - result summary
 - submission timestamp and actor
 
-## Status model
+## Future native status model
+
+Phase one has no status model. If a native Codex surface later needs structured decisions, use a small explicit state model:
 
 Use a small explicit state model:
 
@@ -228,7 +233,7 @@ Comments do not implicitly change status. Approval applies to the reviewed versi
 
 ## Review rounds and history
 
-A review round is an immutable record of what the user was shown. Mutable feedback may be collected while the round is open, but submitting or superseding a round freezes its result.
+A phase-one review round is an optional immutable static snapshot of what the user was shown. Feedback remains in the Codex task. Most iterative work can rebuild the same folder; create a new round only when preserving the prior presentation is useful.
 
 Each later round records:
 
@@ -271,7 +276,7 @@ Unsupported assets still appear as file cards with metadata and a source path. S
 
 ### Agent-initiated, user-controlled
 
-The agent assembles the session, but the user makes creative decisions and controls when feedback is submitted.
+The agent assembles the static presentation, but the user makes creative decisions through Codex's annotation flow.
 
 ### Decisions over dashboarding
 
@@ -295,7 +300,7 @@ Start with a scannable collection. Reveal detailed metadata and precision contro
 
 ### Renderer independence
 
-Do not embed essential review meaning only in DOM position or browser state. The same contract must support a generated web app and a native Codex surface.
+Do not embed essential review meaning only in visual position. Use semantic figures, stable URLs, visible labels, and stable IDs so annotations can map back to assets.
 
 ## Primary demo scenario
 
@@ -327,8 +332,8 @@ The user should be able to review the collection, compare each adaptation to the
 - agent-curated review sessions
 - collection, focus, and comparison modes
 - metadata and relationships
-- annotations, comments, selections, and status decisions
-- persistent rounds and review history
+- annotations and feedback owned by Codex/ChatGPT
+- optional static presentation rounds
 - action summaries returned to the agent
 - a stable contract shared by web and native renderers
 
@@ -347,7 +352,7 @@ The user should be able to review the collection, compare each adaptation to the
 
 ### Feedback cannot be mapped reliably
 
-Mitigate with stable IDs, persistent visible labels, dedicated focus routes, DOM annotations containing entity IDs, and a structured submit step in addition to freeform browser annotation.
+Mitigate with static semantic figures, stable IDs, visible labels, dedicated focus routes, and independently labeled comparison sides. Do not add a parallel submission system.
 
 ### The agent selects the wrong files
 
@@ -355,7 +360,7 @@ Mitigate with relevance heuristics, visible source paths, preflight summaries, m
 
 ### Approval state becomes unsafe or ambiguous
 
-Mitigate by scoping approval to immutable asset versions, separating comments from status, retaining history, and requiring explicit submission.
+Keep approval interpretation in the Codex task. The static phase-one page never claims to persist or enforce approval state.
 
 ### Generated review apps diverge
 
@@ -381,7 +386,7 @@ Mitigate with project-local output, path allowlisting, no external network depen
 - The selected assets and relationships make sense to the user.
 - The user can find and inspect every included asset.
 - Annotations and decisions resolve to the intended asset IDs.
-- Approval and rejection persist across reloads and rounds.
+- Each annotation maps to the intended static asset figure or comparison side.
 - The agent produces an accurate action summary.
 - Revised work generates a traceable next round.
 
@@ -403,7 +408,7 @@ Define entities, lifecycle, review result semantics, skill behavior, and test sc
 
 ### Phase 1: Distributable skill
 
-Build a deterministic local review generator, manifest validator, static browser application, review-state persistence, in-app browser launch workflow, and feedback interpretation instructions. Validate the complete campaign demo loop.
+Build a deterministic static-site generator, manifest validator, semantic overview/focus/comparison templates, agent-openable local launch workflow, and agent-side feedback interpretation instructions. Permit only a read-only loopback static file server as transport; add no application backend or page-owned review state.
 
 ### Phase 2: Skill hardening
 
@@ -426,7 +431,7 @@ Ship a supported Asset Review surface with structured invocation and return valu
 - What status language users understand consistently.
 - How often a later round should show unchanged approved work.
 - Which metadata materially affects decisions.
-- Whether a structured submit flow is required in addition to ambient browser annotations.
+- How the user most clearly signals that an annotation pass is complete within Codex.
 - Which limitations are caused by the web renderer versus the underlying contract.
 
 ## Product completion definition
